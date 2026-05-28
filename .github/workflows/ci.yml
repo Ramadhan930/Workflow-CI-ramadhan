@@ -43,12 +43,12 @@ jobs:
           MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
           echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
           
-          # AMAN & PASTI: Cari langsung path folder 'model' di dalam artifacts mlruns
+          # Cari langsung path folder 'model' di dalam artifacts mlruns
           MODEL_PATH=$(find $MLRUNS_DIR -type d -name "model" | head -n 1)
           echo "Path model absolut ditemukan di: $MODEL_PATH"
           
-          # Jalankan perintah build docker menggunakan lokasi model yang sudah pasti ketemu
-          mlflow models build-docker -m "$MODEL_PATH" -n "my-financial-model" --enable-mlserver
+          # TAMBAHKAN --env-manager=local AGAR BUILD DOCKER BERJALAN VIA PIP TANPA CONDA
+          mlflow models build-docker -m "$MODEL_PATH" -n "my-financial-model" --enable-mlserver --env-manager=local
 
       # 7. Push Docker image ke Docker Hub
       - name: Push to Docker Hub

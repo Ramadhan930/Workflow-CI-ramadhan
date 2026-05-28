@@ -21,13 +21,13 @@ jobs:
       - name: Install dependencies
         run: pip install mlflow==2.19.0 pandas scikit-learn
 
-      # 4. Jalankan MLproject
+      # 4. Jalankan MLproject (Ditambahkan --env-manager=local)
       - name: Run MLflow Project
         run: |
           TARGET_DIR=$(find . -type d -name "MLproject" | head -n 1)
           echo "MLproject ditemukan di: $TARGET_DIR"
           cd "$TARGET_DIR"
-          mlflow run . --experiment-name CI_Experiment
+          mlflow run . --experiment-name CI_Experiment --env-manager=local
 
       # 5. Upload artifact (model) agar bisa diunduh atau digunakan nanti
       - name: Upload model artifact

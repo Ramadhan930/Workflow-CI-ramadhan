@@ -43,8 +43,8 @@ jobs:
           MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
           echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
           
-          # AMAN: Saring hanya folder (direktori) di dalam mlruns/0/ untuk mendapatkan Run ID asli
-          run_id=$(ls -td $MLRUNS_DIR/0/*/ | head -n 1 | xargs basename)
+          # AMAN & AKURAT: Cari direktori di dalam mlruns/0/, abaikan file meta.yaml, dan ambil yang paling atas
+          run_id=$(find $MLRUNS_DIR/0/ -maxdepth 1 -type d ! -path $MLRUNS_DIR/0/ -exec basename {} \;)
           echo "Run ID asli yang didapat: $run_id"
           
           # Jalankan perintah build docker menggunakan lokasi model yang tepat

@@ -1,0 +1,8 @@
+name: financial_model
+conda_env: conda.yaml
+entry_points:
+  main:
+    parameters:
+      train_data: {type: string, default: "financial_data_preprocessed_train.csv"}
+      test_data: {type: string, default: "financial_data_preprocessed_test.csv"}
+    command: "python modelling.py --train {train_data} --test {test_data}"

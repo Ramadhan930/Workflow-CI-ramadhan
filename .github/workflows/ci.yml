@@ -1,0 +1,51 @@
+name: CI-MLflow-Project
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # bisa dijalankan manual dari tab Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout kode dari repo
+      - uses: actions/checkout@v3
+
+      # 2. Setup Python versi yang dibutuhkan
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.7'
+
+      # 3. Install dependencies (mlflow, pandas, scikit-learn)
+      - name: Install dependencies
+        run: pip install mlflow==2.19.0 pandas scikit-learn
+
+      # 4. Jalankan MLproject (akan menghasilkan folder mlruns/)
+      - name: Run MLflow Project
+        run: mlflow run MLproject/ --experiment-name CI_Experiment
+
+      # 5. Upload artifact (model) agar bisa diunduh atau digunakan nanti
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlflow-model
+          path: mlruns/
+
+      # 6. Build Docker image dari model yang baru dilatih
+      - name: Build Docker Image
+        run: |
+          # Ambil run_id terakhir dari folder mlruns
+          run_id=$(ls -t mlruns/0/ | head -1)
+          echo "Run ID: $run_id"
+          mlflow models build-docker -m "runs:/$run_id/model" -n "my-financial-model" --enable-mlserver
+
+      # 7. Push Docker image ke Docker Hub
+      - name: Push to Docker Hub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker tag my-financial-model $DOCKER_USER/my-financial-model:latest
+          echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+          docker push $DOCKER_USER/my-financial-model:latest

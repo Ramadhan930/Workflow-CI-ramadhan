@@ -23,7 +23,7 @@ jobs:
 
       # 4. Jalankan MLproject (akan menghasilkan folder mlruns/)
       - name: Run MLflow Project
-        run: mlflow run MLproject/ --experiment-name CI_Experiment
+        run: mlflow run Workflow-CI/MLproject/ --experiment-name CI_Experiment
 
       # 5. Upload artifact (model) agar bisa diunduh atau digunakan nanti
       - name: Upload model artifact

@@ -43,9 +43,9 @@ jobs:
           MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
           echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
           
-          # Ambil run_id terakhir dari folder mlruns yang ada di sini
-          run_id=$(ls -t $MLRUNS_DIR/0/ | head -1)
-          echo "Run ID yang didapat: $run_id"
+          # AMAN: Saring hanya folder (direktori) di dalam mlruns/0/ untuk mendapatkan Run ID asli
+          run_id=$(ls -td $MLRUNS_DIR/0/*/ | head -n 1 | xargs basename)
+          echo "Run ID asli yang didapat: $run_id"
           
           # Jalankan perintah build docker menggunakan lokasi model yang tepat
           mlflow models build-docker -m "$MLRUNS_DIR/0/$run_id/model" -n "my-financial-model" --enable-mlserver

@@ -43,8 +43,7 @@ jobs:
           MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
           echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
           
-          # Ambil run_id dari direktori experiment '0' atau experiment aktif lainnya
-          # Gunakan path absolut/relatif yang ditemukan oleh 'find'
+          # Ambil run_id terakhir dari folder mlruns yang ada di sini
           run_id=$(ls -t $MLRUNS_DIR/0/ | head -1)
           echo "Run ID yang didapat: $run_id"
           

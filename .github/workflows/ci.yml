@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pip install mlflow==2.19.0 pandas scikit-learn
 
-      # 4. Jalankan MLproject (Mencari letak MLproject secara otomatis)
+      # 4. Jalankan MLproject
       - name: Run MLflow Project
         run: |
           TARGET_DIR=$(find . -type d -name "MLproject" | head -n 1)
@@ -39,12 +39,17 @@ jobs:
       # 6. Build Docker image dari model yang baru dilatih
       - name: Build Docker Image
         run: |
-          TARGET_DIR=$(find . -type d -name "MLproject" | head -n 1)
-          cd "$TARGET_DIR"
-          # Ambil run_id terakhir dari folder mlruns yang ada di sini
-          run_id=$(ls -t mlruns/0/ | head -1)
-          echo "Run ID: $run_id"
-          mlflow models build-docker -m "runs:/$run_id/model" -n "my-financial-model" --enable-mlserver
+          # Cari folder mlruns yang dihasilkan secara dinamis di server
+          MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
+          echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
+          
+          # Ambil run_id dari direktori experiment '0' atau experiment aktif lainnya
+          # Gunakan path absolut/relatif yang ditemukan oleh 'find'
+          run_id=$(ls -t $MLRUNS_DIR/0/ | head -1)
+          echo "Run ID yang didapat: $run_id"
+          
+          # Jalankan perintah build docker menggunakan lokasi model yang tepat
+          mlflow models build-docker -m "$MLRUNS_DIR/0/$run_id/model" -n "my-financial-model" --enable-mlserver
 
       # 7. Push Docker image ke Docker Hub
       - name: Push to Docker Hub

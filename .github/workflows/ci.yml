@@ -21,10 +21,12 @@ jobs:
       - name: Install dependencies
         run: pip install mlflow==2.19.0 pandas scikit-learn
 
-      # 4. Jalankan MLproject (Pindah folder dulu baru jalankan mlflow)
+      # 4. Jalankan MLproject (Mencari letak MLproject secara otomatis)
       - name: Run MLflow Project
         run: |
-          cd Workflow-CI/MLproject/
+          TARGET_DIR=$(find . -type d -name "MLproject" | head -n 1)
+          echo "MLproject ditemukan di: $TARGET_DIR"
+          cd "$TARGET_DIR"
           mlflow run . --experiment-name CI_Experiment
 
       # 5. Upload artifact (model) agar bisa diunduh atau digunakan nanti
@@ -32,12 +34,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mlflow-model
-          path: Workflow-CI/MLproject/mlruns/
+          path: "**/mlruns/"
 
       # 6. Build Docker image dari model yang baru dilatih
       - name: Build Docker Image
         run: |
-          cd Workflow-CI/MLproject/
+          TARGET_DIR=$(find . -type d -name "MLproject" | head -n 1)
+          cd "$TARGET_DIR"
           # Ambil run_id terakhir dari folder mlruns yang ada di sini
           run_id=$(ls -t mlruns/0/ | head -1)
           echo "Run ID: $run_id"

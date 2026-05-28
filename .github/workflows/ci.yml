@@ -43,12 +43,12 @@ jobs:
           MLRUNS_DIR=$(find . -type d -name "mlruns" | head -n 1)
           echo "Folder mlruns ditemukan di: $MLRUNS_DIR"
           
-          # AMAN & AKURAT: Cari direktori di dalam mlruns/0/, abaikan file meta.yaml, dan ambil yang paling atas
-          run_id=$(find $MLRUNS_DIR/0/ -maxdepth 1 -type d ! -path $MLRUNS_DIR/0/ -exec basename {} \;)
-          echo "Run ID asli yang didapat: $run_id"
+          # AMAN & PASTI: Cari langsung path folder 'model' di dalam artifacts mlruns
+          MODEL_PATH=$(find $MLRUNS_DIR -type d -name "model" | head -n 1)
+          echo "Path model absolut ditemukan di: $MODEL_PATH"
           
-          # Jalankan perintah build docker menggunakan lokasi model yang tepat
-          mlflow models build-docker -m "$MLRUNS_DIR/0/$run_id/model" -n "my-financial-model" --enable-mlserver
+          # Jalankan perintah build docker menggunakan lokasi model yang sudah pasti ketemu
+          mlflow models build-docker -m "$MODEL_PATH" -n "my-financial-model" --enable-mlserver
 
       # 7. Push Docker image ke Docker Hub
       - name: Push to Docker Hub
